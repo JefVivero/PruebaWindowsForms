@@ -24,25 +24,11 @@ namespace WindowsFormsContacts
         {
             OpenDetails();
         }
-        #endregion
 
-        #region Private Methods
-        private void OpenDetails()
+        private void BtnSearch_Click(object sender, EventArgs e)
         {
-            ContactDetails contact = new ContactDetails();
-            contact.ShowDialog(this);
-        }
-        #endregion
-
-        private void Contacts_Load(object sender, EventArgs e)
-        {
-            PopulateContacts();
-        }
-
-        public void PopulateContacts()
-        {
-            List<Contact> contacts = _bussinessLogicLayer.GetContacts();
-            GridContacts.DataSource = contacts;
+            PopulateContacts(TxtSearch.Text);
+            TxtSearch.Text = String.Empty;
         }
 
         private void GridContacts_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -64,6 +50,40 @@ namespace WindowsFormsContacts
                 contactDetails.ShowDialog(this.Owner);
 
             }
+            else if (cell.Value.ToString() == "Delete")
+            {
+                DeleteContact(int.Parse(GridContacts.Rows[e.RowIndex].Cells[0].Value.ToString()));
+                PopulateContacts();
+            }
         }
+
+        private void Contacts_Load(object sender, EventArgs e)
+        {
+            PopulateContacts();
+        }
+        #endregion
+
+        #region Private Methods
+        private void OpenDetails()
+        {
+            ContactDetails contact = new ContactDetails();
+            contact.ShowDialog(this);
+        }
+
+        private void DeleteContact(int id)
+        {
+            _bussinessLogicLayer.DeleteContact(id);
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public void PopulateContacts(string searchText = null)
+        {
+            List<Contact> contacts = _bussinessLogicLayer.GetContacts(searchText);
+            GridContacts.DataSource = contacts;
+        }
+        #endregion
     }
 }

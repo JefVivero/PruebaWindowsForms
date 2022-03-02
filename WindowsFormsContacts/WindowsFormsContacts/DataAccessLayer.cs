@@ -54,14 +54,27 @@ namespace WindowsFormsContacts
             }
         }
 
-        public List<Contact> GetContacts()
+        public List<Contact> GetContacts(string searchText = null)
         {
             List<Contact> contact = new List<Contact>();
             try
             {
                 _conn.Open();
                 string query = @"select Id, Firstname, Lastname, Email, Phone, Address from Contacts";
-                SqlCommand command = new SqlCommand(query,_conn);
+
+                SqlCommand command = new SqlCommand();
+
+                if (!string.IsNullOrEmpty(searchText))
+                {
+                    query += $" WHERE Firstname like @searchText or" +
+                             $" Lastname like @searchText or" +
+                             $" Email like @searchText or" +
+                             $" Phone like @searchText or" +
+                             $" Address like @searchText";
+                    command.Parameters.Add(new SqlParameter("@searchText", $"%{searchText}%"));
+                }
+                command.CommandText = query;
+                command.Connection = _conn;
 
                 SqlDataReader reader = command.ExecuteReader();
 
@@ -95,7 +108,54 @@ namespace WindowsFormsContacts
             try
             {
                 _conn.Open();
-                string query = @"";
+                string query = @"UPDATE CONTACTS 
+                                SET FirstName=@FirstName, 
+                                    LastName=@LastName,
+                                    Email=@Email,
+                                    Phone=@Phone, 
+                                    Address=@Address
+                                WHERE ID=@ID";
+
+                SqlParameter id = new SqlParameter("@ID", contact.Id);
+                SqlParameter firstname = new SqlParameter("@FirstName", contact.FirstName);
+                SqlParameter lastname = new SqlParameter("@LastName", contact.LastName);
+                SqlParameter email = new SqlParameter("@Email", contact.Email);
+                SqlParameter phone = new SqlParameter("@Phone", contact.Phone);
+                SqlParameter address = new SqlParameter("@Address", contact.Address);
+
+                SqlCommand command = new SqlCommand(query, _conn);
+                command.Parameters.Add(id);
+                command.Parameters.Add(firstname);
+                command.Parameters.Add(lastname);
+                command.Parameters.Add(email);
+                command.Parameters.Add(phone);
+                command.Parameters.Add(address);
+
+                command.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+
+                MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                _conn.Close();
+            }
+        }
+
+        public void DeleteContact(int id)
+        {
+            try
+            {
+                _conn.Open();
+                string query = $"DELETE FROM CONTACTS WHERE ID=@ID";                
+
+                SqlCommand command = new SqlCommand(query, _conn);
+                command.Parameters.Add(new SqlParameter("@ID", id));
+
+                command.ExecuteNonQuery();
+
             }
             catch (Exception e)
             {

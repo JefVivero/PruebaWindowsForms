@@ -20,6 +20,7 @@ namespace WindowsFormsContacts
             _businessLogicLayer = new BusinessLogicLayer();
         }
 
+        #region Events
         private void label1_Click(object sender, EventArgs e)
         {
 
@@ -29,14 +30,15 @@ namespace WindowsFormsContacts
         {
             this.Close();
         }
-
         private void BtnAdd_Click(object sender, EventArgs e)
         {
             SaveContact();
             this.Close();
             ((Contacts)this.Owner).PopulateContacts();
         }
+        #endregion
 
+        #region Private Methods
         private void SaveContact()
         {
             Contact contact = new Contact()
@@ -51,7 +53,17 @@ namespace WindowsFormsContacts
 
             _businessLogicLayer.SaveContact(contact);
         }
+        private void ClearForm()
+        {
+            TxtFirstName.Text = string.Empty;
+            TxtLastName.Text = string.Empty;
+            TxtEmail.Text = string.Empty;
+            TxtPhone.Text = string.Empty;
+            TxtAddress.Text = string.Empty;
+        }
+        #endregion
 
+        #region Public Methods
         public void LoadContact(Contact contact)
         {
             _contact = contact;
@@ -65,14 +77,7 @@ namespace WindowsFormsContacts
                 TxtAddress.Text = contact.Address;
             }
         }
+        #endregion
 
-        private void ClearForm()
-        {
-            TxtFirstName.Text = string.Empty;
-            TxtLastName.Text = string.Empty;
-            TxtEmail.Text = string.Empty;
-            TxtPhone.Text = string.Empty;
-            TxtAddress.Text = string.Empty;
-        }
     }
 }
